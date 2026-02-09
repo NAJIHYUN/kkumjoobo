@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>꿈청 주보 생성기</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' x='4' font-size='52'%3E%F0%9F%93%84%3C/text%3E%3C/svg%3E" />
+
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- 다운로드용 -->
+  <script defer src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script defer src="./app.js"></script>
+</head>
+
+<body>
+<header>
+  <div class="header-left">
+    <strong>꿈청 주보 생성기</strong>
+    <span class="header-sub">JIS B5 · 가로 반접기 · 흑백</span>
+  </div>
+  <div class="header-right">
+    인쇄: B5 JIS / 가로 / 양면(짧은 변) 권장
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- 입력 -->
+  <section class="panel">
+    <h2>입력창</h2>
+    <div class="form">
+      <div class="form-options">
+        <button id="btnAdsMany" class="toggle-btn" type="button" aria-pressed="false">광고 사항 많음</button>
+        <button id="btnShowQr" class="toggle-btn" type="button" aria-pressed="false">QR 코드 표시</button>
+        <button id="btnClearAll" class="toggle-btn danger" type="button">내용 모두 지우기</button>
+      </div>
+      <div class="form-section" data-section="cover">
+        <button class="section-toggle" type="button" aria-expanded="true">
+          <span class="section-title">표지 내용</span>
+          <span class="section-icon">▾</span>
+        </button>
+        <div class="section-body">
+      <div class="row2">
+        <div>
+          <label>날짜</label>
+          <div class="date-wrap">
+            <input id="inDate" type="text" value="" placeholder="YYYY년 MM월 DD일"/>
+            <input id="inDatePicker" type="date" aria-label="날짜 선택"/>
+          </div>
+        </div>
+        <div>
+          <label>설교 제목</label>
+          <input id="inSermonTitle" type="text" value="" placeholder="예: 기억을 걷는 시간" />
+        </div>
+      </div>
+
+      <div>
+        <label>상단 말씀</label>
+        <textarea id="inHeaderVerse" placeholder="(기본 공란)"></textarea>
+      </div>
+      <div class="row2">
+        <div>
+          <label>찬양 콘티</label>
+          <textarea id="inPraise" placeholder="한 줄에 한 곡씩"></textarea>
+        </div>
+        <div>
+          <label>결단 찬양</label>
+          <textarea id="inResponsePraise" type="text" ></textarea>
+        </div>
+      </div>
+<div class="hint">
+        ※ 이름을 기입할 때 띄어쓰기 사용하지 마세요.
+          </div>
+      <div class="row2">
+        <div>
+          <label>대표기도</label>
+          <input id="inPrayerLeader" type="text" placeholder="김꿈청청년"/>
+        </div>
+        <div>
+          <label>헌금봉헌</label>
+          <input id="inOfferingLeader" type="text" placeholder="김꿈청청년"/>
+        </div>
+      </div>
+
+      <div>
+        <label>광고</label>
+        <input id="inAdLeader" type="text" placeholder="김현오목사"/>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label>말씀선포</label>
+          <input id="inSermonPreacher" type="text" placeholder="김현오목사"/>
+        </div>
+        <div>
+          <label>축도</label>
+          <input id="inBenediction" type="text" placeholder="김현오목사"/>
+        </div>
+      </div>
+        </div>
+      </div>
+
+
+      <div class="form-section" data-section="ads">
+        <button class="section-toggle" type="button" aria-expanded="true">
+          <span class="section-title">광고 사항</span>
+          <span class="section-icon">▾</span>
+        </button>
+        <div class="section-body">
+          <div id="adInputs" class="ad-inputs">
+            <div id="adInputsVar" class="ad-inputs-group"></div>
+            <button id="btnAddAd" class="ad-add" type="button">+ 광고 추가</button>
+            <div id="adInputsDefault" class="ad-inputs-group"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" data-section="body">
+        <button class="section-toggle" type="button" aria-expanded="true">
+          <span class="section-title">본문</span>
+          <span class="section-icon">▾</span>
+        </button>
+        <div class="section-body">
+          <div class="body-inputs">
+            <textarea id="inSermonBody" placeholder="1 태초에 하나님이 천지를 창조하시니라"></textarea>
+            <input id="inSermonRef" type="text" placeholder="창세기 1장 1절"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" data-section="share">
+        <button class="section-toggle" type="button" aria-expanded="true">
+          <span class="section-title">나눔 GBS</span>
+          <span class="section-icon">▾</span>
+        </button>
+        <div class="section-body">
+          <div id="shareInputs" class="share-inputs">
+            <div id="shareInputsVar" class="share-inputs-group"></div>
+            <button id="btnAddShare" class="share-add" type="button">+ 나눔 추가</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 미리보기 -->
+  <section class="panel">
+    <div class="tabs">
+        <div class="tab-buttons">
+          <div class="tab active" data-tab="print">인쇄용(겉면/속면)</div>
+          <div class="tab" data-tab="read">모바일용</div>
+        </div>
+        <div class="actions">
+          <button id="btnPrint">인쇄/저장(PDF)</button>
+          <button id="btnPng">PNG 다운로드</button>
+          <button id="btnFeedback">문의</button>
+        </div>
+      </div>
+
+    <div class="preview-area">
+      <!-- 인쇄용 -->
+      <div id="tabPrint">
+        <div class="print-note">
+          • 1페이지(겉면): 좌 - 광고 / 우 - 표지(접었을 때 1페이지)<br/>
+          • 2페이지(속면): 좌 - 설교제목+나눔 / 우 - 메모
+        </div>
+
+        <!-- 겉면 -->
+        <div class="sheet" id="sheetOuter">
+          <div class="fold-guide"></div>
+          <div class="sheet-inner">
+
+            <!-- 겉면 좌: 광고 -->
+            <div class="panel-page ads-page" id="adsPage">
+              <div class="ads-qr" id="qrWrap">
+                <img id="qrImage" src="./images/kkum_chung.png" alt="QR 코드" />
+              </div>
+              <div class="ads-title" id="adsTitle">광고</div>
+              <div id="adsPrimary" class="ads-list"></div>
+            </div>
+
+            <!-- 겉면 우: 표지 + 예배순서 -->
+            <div class="panel-page cover-page">
+              <div class="cover-date" id="pDate"></div>
+              <div class="cover-title">꿈꾸는교회 청년부 주일 예배</div>
+              <div class="cover-verse" id="pHeaderVerse"></div>
+
+              <div class="rule-wrap bottom">
+                <div class="rule"></div>
+                <div class="diamond"></div>
+                <div class="rule"></div>
+              </div>
+
+              <div class="liturgy">
+                <div class="lit-row">
+                  <div class="lit-label">사 도 신 경</div>
+                  <div class="lit-mid"></div>
+                  <div class="lit-right">다 같 이</div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">경 배 와 찬 양</div>
+                  <div class="lit-mid" id="pPraise"></div>
+                  <div class="lit-right">다 같 이</div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">대 표 기 도</div>
+                  <div class="lit-mid"></div>
+                  <div class="lit-right" id="pPrayerLeader"></div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">광 고</div>
+                  <div class="lit-mid lit-gray"><span class="lit-mid-text lit-gray-text font-ssn">뒷면 참고</span></div>
+                  <div class="lit-right" id="pAdLeader"></div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">헌 금 봉 헌</div>
+                  <div class="lit-mid"></div>
+                  <div class="lit-right" id="pOfferingLeader"></div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">말 씀 선 포</div>
+                  <div class="lit-mid stacked" id="pSermonTitleQuoted">
+                    <span class="lit-mid-text"></span>
+                    <span class="lit-mid-text ref-line"></span>
+                  </div>
+                  <div class="lit-right" id="pSermonPreacher"></div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">결 단 찬 양</div>
+                  <div class="lit-mid" id="pResponsePraise"></div>
+                  <div class="lit-right">다 같 이</div>
+                </div>
+
+                <div class="lit-row">
+                  <div class="lit-label">축 도</div>
+                  <div class="lit-mid"></div>
+                  <div class="lit-right" id="pBenediction"></div>
+                </div>
+              </div>
+
+              <div class="rule-wrap bottom">
+                <div class="rule"></div>
+                <div class="diamond"></div>
+                <div class="rule"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 속면 -->
+        <div class="sheet" id="sheetInner">
+          <div class="fold-guide"></div>
+          <div class="sheet-inner">
+
+            <!-- 속면 좌: 설교제목 + 나눔 -->
+            <div class="panel-page share-page">
+              <div class="sermon-title" id="pSermonTitle"></div>
+              <div class="sermon-body" id="pSermonBody"></div>
+
+              <div class="share-block">
+                <div class="share-item" id="share1"></div>
+                <div class="share-item" id="share2"></div>
+                <div class="share-item" id="share3"></div>
+                <div class="share-item" id="share4"></div>
+              </div>
+            </div>
+
+            <!-- 속면 우: memo + (광고 overflow) -->
+            <div class="panel-page memo-page" id="memoPage">
+              <div class="memo-block" id="memoBlock">
+                <div class="memo-title" id="memoTitle">메모</div>
+                <div class="memo-box" id="memoBox"></div>
+              </div>
+
+              <div class="ads-overflow-wrap" id="adsOverflowWrap">
+                <div id="adsOverflow" class="ads-list overflow"></div>
+              </div>
+
+              <div id="overflowWarning" class="warning hidden">
+                광고가 메모 아래 공간을 넘어갔어요. (다음 단계에서 3페이지 처리/글자 자동 축소로 확장 가능)
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 읽기용 -->
+      <div id="tabRead">
+        <div id="readStack" class="read-stack"></div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<div id="feedbackModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="feedbackTitle">개발자에게 피드백</h3>
+      <button id="btnFeedbackClose" class="modal-close" type="button" aria-label="닫기">×</button>
+    </div>
+    <div class="modal-body">
+      <label for="feedbackSubject">제목</label>
+      <input id="feedbackSubject" type="text" placeholder="제목을 입력하세요" />
+      <label for="feedbackMessage">내용</label>
+      <textarea id="feedbackMessage" placeholder="피드백 내용을 입력하세요"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button id="btnFeedbackSend" class="modal-send" type="button">보내기</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
