@@ -944,8 +944,8 @@ button:hover{ border-color:#bbb; }
   font-family: 'presentation';
   word-break: keep-all;
   overflow-wrap: break-word;
-  padding-left: 3em;
-  text-indent: -3em;
+  padding-left: 2.7em;
+  text-indent: -2.7em;
 }
 .share-item.is-empty{
   display:none;
