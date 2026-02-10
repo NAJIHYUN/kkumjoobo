@@ -688,8 +688,8 @@ function setupActions() {
     if (!target) return;
 
     const fileName = (activeTab === 'print')
-      ? `${getDateFilePrefix()} 꿈청 주보.png`
-      : `${getDateFilePrefix()} 꿈청 주보 모바일.png`;
+      ? `${getDateFilePrefix()} 주보.png`
+      : `${getDateFilePrefix()} 주보(모바일).png`;
     const canvas = await html2canvas(target, { scale: 4, backgroundColor: '#ffffff' });
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (!blob) return;
