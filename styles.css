@@ -637,7 +637,6 @@ button:hover{ border-color:#bbb; }
   width: var(--b5-w);
   height: var(--b5-h);
   background: var(--paper);
-  border: 1px solid #d6d6d6;
   margin: 0 auto 30px auto;
   position:relative;
   box-shadow: 0 10px 30px rgba(0,0,0,.07);
