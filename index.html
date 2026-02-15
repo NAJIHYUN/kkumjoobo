@@ -57,18 +57,25 @@
             <input id="inDatePicker" type="date" aria-label="날짜 선택"/>
           </div>
         </div>
+        <div aria-hidden="true"></div>
+      </div>
+      <div class="row2">
         <div>
           <label>설교 제목</label>
-          <input id="inSermonTitle" type="text" value="" placeholder="예: 기억을 걷는 시간" />
+          <input id="inSermonTitle" type="text" value="" placeholder="제목" />
+        </div>
+        <div>
+          <label>본문</label>
+          <input id="inSermonRef" type="text" placeholder="창세기 1장 1절"/>
         </div>
       </div>
 
       <div>
         <label>상단 말씀</label>
-        <textarea id="inHeaderVerse" placeholder="(기본 공란)"></textarea>
+        <textarea id="inHeaderVerse" placeholder="(기본 공란)">하나님은 영이시니 예배하는 자가 영과 진리로 예배할지니라
+(요한복음 4장 24절)</textarea>
       </div>
-      <div class="row2">
-        <div>
+         <div>
           <label>찬양 콘티</label>
           <textarea id="inPraise" placeholder="한 줄에 한 곡씩"></textarea>
         </div>
@@ -76,7 +83,6 @@
           <label>결단 찬양</label>
           <textarea id="inResponsePraise" type="text" ></textarea>
         </div>
-      </div>
 <div class="hint">
         ※ 이름을 기입할 때 띄어쓰기 사용하지 마세요.
           </div>
@@ -85,25 +91,19 @@
           <label>대표기도</label>
           <input id="inPrayerLeader" type="text" placeholder="김꿈청청년"/>
         </div>
-        <div>
-          <label>헌금봉헌</label>
-          <input id="inOfferingLeader" type="text" placeholder="김꿈청청년"/>
-        </div>
-      </div>
-
       <div>
         <label>광고</label>
-        <input id="inAdLeader" type="text" placeholder="김현오목사"/>
+        <input id="inAdLeader" type="text" value="김현오목사" placeholder="김현오목사"/>
       </div>
-
+      </div>
       <div class="row2">
         <div>
           <label>말씀선포</label>
-          <input id="inSermonPreacher" type="text" placeholder="김현오목사"/>
+          <input id="inSermonPreacher" type="text" value="김현오목사" placeholder="김현오목사"/>
         </div>
         <div>
           <label>축도</label>
-          <input id="inBenediction" type="text" placeholder="김현오목사"/>
+          <input id="inBenediction" type="text" value="김현오목사" placeholder="김현오목사"/>
         </div>
       </div>
         </div>
@@ -132,7 +132,6 @@
         <div class="section-body">
           <div class="body-inputs">
             <textarea id="inSermonBody" placeholder="1 태초에 하나님이 천지를 창조하시니라"></textarea>
-            <input id="inSermonRef" type="text" placeholder="창세기 1장 1절"/>
           </div>
         </div>
       </div>
@@ -191,10 +190,12 @@
 
             <!-- 겉면 우: 표지 + 예배순서 -->
             <div class="panel-page cover-page">
-              <div class="cover-date" id="pDate"></div>
-              <div class="cover-title">꿈꾸는교회 청년부 주일 예배</div>
+              <div class="cover-head">
+                <div class="cover-date" id="pDate"></div>
+                <div class="cover-title">꿈꾸는교회 청년부 주일 예배</div>
+              </div>
               <div class="cover-verse" id="pHeaderVerse"></div>
-
+              <div>
               <div class="rule-wrap bottom">
                 <div class="rule"></div>
                 <div class="diamond"></div>
@@ -229,7 +230,7 @@
                 <div class="lit-row">
                   <div class="lit-label">헌 금 봉 헌</div>
                   <div class="lit-mid"></div>
-                  <div class="lit-right" id="pOfferingLeader"></div>
+                  <div class="lit-right">다 같 이</div>
                 </div>
 
                 <div class="lit-row">
@@ -258,6 +259,7 @@
                 <div class="rule"></div>
                 <div class="diamond"></div>
                 <div class="rule"></div>
+              </div>
               </div>
             </div>
           </div>
