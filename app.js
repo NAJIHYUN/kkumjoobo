@@ -193,6 +193,77 @@ function buildVerseBody(el, text) {
   });
 }
 
+function setDefaultAdEditable(item, isEditable) {
+  if (!item || item.dataset.default !== '1') return;
+  const editable = Boolean(isEditable);
+  item.classList.toggle('is-locked', !editable);
+
+  const titleInput = item.querySelector('.ad-title');
+  const bodyInput = item.querySelector('.ad-body');
+  [titleInput, bodyInput].forEach((input) => {
+    if (!input) return;
+    input.readOnly = !editable;
+    input.setAttribute('draggable', editable ? 'true' : 'false');
+  });
+
+  const toggleBtn = item.querySelector('.ad-edit-toggle');
+  if (toggleBtn) {
+    toggleBtn.textContent = editable ? '완료' : '수정';
+    toggleBtn.setAttribute('aria-pressed', String(editable));
+  }
+}
+
+function createAdInputElement({ label, title = '', body = '', isDefault = false }) {
+  const el = document.createElement('div');
+  el.className = 'ad-item';
+  el.dataset.default = isDefault ? '1' : '0';
+  el.setAttribute('draggable', isDefault ? 'false' : 'true');
+
+  const editButton = isDefault
+    ? '<button type="button" class="ad-edit-toggle" aria-pressed="false">수정</button>'
+    : '';
+
+  el.innerHTML = `
+    <div class="ad-head">
+      <strong>${label}</strong>
+      <div class="ad-actions">
+        ${editButton}
+        <button type="button" class="ad-remove" aria-label="삭제">×</button>
+      </div>
+    </div>
+    <div>
+      <label>제목</label>
+      <input type="text" class="ad-title" value="${title}" placeholder="" />
+    </div>
+    <div>
+      <label>내용</label>
+      <textarea class="ad-body" placeholder="">${body}</textarea>
+    </div>
+  `;
+
+  if (isDefault) {
+    setDefaultAdEditable(el, false);
+  }
+
+  return el;
+}
+
+function updateAdLabels() {
+  const varItems = [...document.querySelectorAll('#adInputsVar .ad-item')];
+  const defaultItems = [...document.querySelectorAll('#adInputsDefault .ad-item')];
+
+  varItems.forEach((item, idx) => {
+    const titleEl = item.querySelector('.ad-head strong');
+    if (titleEl) titleEl.textContent = `광고 ${idx + 1}`;
+  });
+
+  defaultItems.forEach((item) => {
+    const titleEl = item.querySelector('.ad-head strong');
+    const name = trimOrEmpty(item.querySelector('.ad-title')?.value);
+    if (titleEl) titleEl.textContent = name || '기본광고';
+  });
+}
+
 /** -----------------------------
  *  입력 UI 자동 생성
  *  - 광고 1~12 (제목/내용)
@@ -207,62 +278,25 @@ function buildInputs() {
 
   if (!adWrap || !adWrapVar || !adWrapDefault || !shareWrap || !shareWrapVar) return;
 
-  function createAdInput({ label, title = '', body = '', isDefault = false }) {
-    const el = document.createElement('div');
-    el.className = 'ad-item';
-    el.dataset.default = isDefault ? '1' : '0';
-    el.innerHTML = `
-      <div class="ad-head">
-        <strong>${label}</strong>
-        <button type="button" class="ad-remove" aria-label="삭제">×</button>
-      </div>
-      <div>
-        <label>제목</label>
-        <input type="text" class="ad-title" value="${title}" placeholder="" />
-      </div>
-      <div>
-        <label>내용(줄마다 자동 '-' 불렛)</label>
-        <textarea class="ad-body" placeholder="">${body}</textarea>
-      </div>
-    `;
-    return el;
-  }
-
   function appendDefaultAds() {
-    adWrapDefault.appendChild(createAdInput({
+    adWrapDefault.appendChild(createAdInputElement({
       label: '광고',
       title: '새가족 안내',
       body: '새가족 등록을 원하시는 분은 예배 후 2층 로비에서 처음마을 리더(임현경)에게 문의',
       isDefault: true
     }));
-    adWrapDefault.appendChild(createAdInput({
+    adWrapDefault.appendChild(createAdInputElement({
       label: '광고',
       title: '온라인 헌금 안내',
-      body: `청년부 온라인 헌금 계좌 : 신한 100-034-286804
-예금주 : 꿈꾸는교회 박종철
-이체 시 '성명 + 생년월일 + 헌금 종류'로 표기 (예. 김꿈청900301십)`,
+      body: `- 청년부 온라인 헌금 계좌 : 신한 100-034-286804
+- 예금주 : 꿈꾸는교회 박종철
+- 이체 시 '성명 + 생년월일 + 헌금 종류'로 표기 (예. 김꿈청900301십)`,
       isDefault: true
     }));
   }
 
-  function updateAdLabels() {
-    const varItems = [...document.querySelectorAll('#adInputsVar .ad-item')];
-    const defaultItems = [...document.querySelectorAll('#adInputsDefault .ad-item')];
-
-    varItems.forEach((item, idx) => {
-      const titleEl = item.querySelector('.ad-head strong');
-      if (titleEl) titleEl.textContent = `광고 ${idx + 1}`;
-    });
-
-    defaultItems.forEach((item) => {
-      const titleEl = item.querySelector('.ad-head strong');
-      const name = trimOrEmpty(item.querySelector('.ad-title')?.value);
-      if (titleEl) titleEl.textContent = name || '기본광고';
-    });
-  }
-
   // 가변 광고 기본 1개
-  adWrapVar.appendChild(createAdInput({ label: '광고 1' }));
+  adWrapVar.appendChild(createAdInputElement({ label: '광고 1' }));
 
   // 기본 광고 2개(항상 마지막)
   appendDefaultAds();
@@ -454,12 +488,14 @@ function render() {
   const adsMany = $('btnAdsMany')?.classList.contains('is-on') ?? false;
 
   const prayerLeader = rawPrayerLeader || '(대표기도)';
-  const offeringLeader = rawOfferingLeader || '(헌금봉헌)';
+  const offeringLeader = rawOfferingLeader || '다같이';
   const adLeader = rawAdLeader || '(광고)';
   const sermonPreacher = rawSermonPreacher || '(말씀선포)';
   const benediction = rawBenediction || '(축도)';
   const prayerLeaderSpaced = addInterCharacterSpacing(prayerLeader);
-  const offeringLeaderSpaced = addInterCharacterSpacing(offeringLeader);
+  const offeringLeaderSpaced = rawOfferingLeader
+    ? addInterCharacterSpacing(offeringLeader)
+    : offeringLeader;
   const adLeaderSpaced = addInterCharacterSpacing(adLeader);
   const sermonPreacherSpaced = addInterCharacterSpacing(sermonPreacher);
   const benedictionSpaced = addInterCharacterSpacing(benediction);
@@ -480,7 +516,7 @@ function render() {
   setLitMidText('pResponsePraise', responsePraiseLines, false, false);
 
   setPreviewText($('pPrayerLeader'), prayerLeaderSpaced, !rawPrayerLeader);
-  setPreviewText($('pOfferingLeader'), offeringLeaderSpaced, !rawOfferingLeader);
+  setPreviewText($('pOfferingLeader'), offeringLeaderSpaced, false);
   setPreviewText($('pAdLeader'), adLeaderSpaced, !rawAdLeader);
   setPreviewText($('pSermonPreacher'), sermonPreacherSpaced, !rawSermonPreacher);
   setPreviewText($('pBenediction'), benedictionSpaced, !rawBenediction);
@@ -668,7 +704,7 @@ function setupActions() {
     const pages = [outer, inner];
 
     for (let i = 0; i < pages.length; i++) {
-      const canvas = await html2canvas(pages[i], { scale: 4, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(pages[i], { scale: 6, backgroundColor: '#ffffff' });
       const img = canvas.toDataURL('image/png');
 
       if (i > 0) pdf.addPage([257, 182], 'landscape');
@@ -690,7 +726,7 @@ function setupActions() {
     const fileName = (activeTab === 'print')
       ? `${getDateFilePrefix()} 주보.png`
       : `${getDateFilePrefix()} 주보(모바일).png`;
-    const canvas = await html2canvas(target, { scale: 4, backgroundColor: '#ffffff' });
+    const canvas = await html2canvas(target, { scale: 6, backgroundColor: '#ffffff' });
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (!blob) return;
     const url = URL.createObjectURL(blob);
@@ -712,7 +748,7 @@ function setupActions() {
     const pages = [outer, inner];
 
     for (let i = 0; i < pages.length; i++) {
-      const canvas = await html2canvas(pages[i], { scale: 4, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(pages[i], { scale: 6, backgroundColor: '#ffffff' });
       const img = canvas.toDataURL('image/png');
 
       if (i > 0) pdf.addPage([257, 182], 'landscape');
@@ -806,6 +842,7 @@ function setupAdInputs() {
   const adWrapVar = $('adInputsVar');
   const addBtn = $('btnAddAd');
   if (!adWrap || !adWrapVar || !addBtn) return;
+  let draggingItem = null;
 
   const adsSectionBody = adWrap.closest('.section-body');
   const updateAdsSectionHeight = () => {
@@ -822,6 +859,19 @@ function setupAdInputs() {
   });
 
   adWrap.addEventListener('click', (e) => {
+    const toggleBtn = e.target?.closest?.('.ad-edit-toggle');
+    if (toggleBtn) {
+      const item = toggleBtn.closest('.ad-item');
+      if (!item || item.dataset.default !== '1') return;
+      const willEdit = item.classList.contains('is-locked');
+      setDefaultAdEditable(item, willEdit);
+      if (!willEdit) {
+        requestRender();
+        persistFormState();
+      }
+      return;
+    }
+
     const btn = e.target?.closest?.('.ad-remove');
     if (!btn) return;
     const item = btn.closest('.ad-item');
@@ -840,28 +890,62 @@ function setupAdInputs() {
   });
 
   addBtn.addEventListener('click', () => {
-    const el = document.createElement('div');
-    el.className = 'ad-item';
-    el.dataset.default = '0';
-    el.innerHTML = `
-      <div class="ad-head">
-        <strong>광고</strong>
-        <button type="button" class="ad-remove" aria-label="삭제">×</button>
-      </div>
-      <div>
-        <label>제목</label>
-        <input type="text" class="ad-title" value="" placeholder="" />
-      </div>
-      <div>
-        <label>내용(줄마다 자동 '-' 불렛)</label>
-        <textarea class="ad-body" placeholder=""></textarea>
-      </div>
-    `;
+    const el = createAdInputElement({ label: '광고' });
     adWrapVar.appendChild(el);
     requestRender();
     persistFormState();
     updateAdsSectionHeight();
     updateAdLabels();
+  });
+
+  const getDragAfterElement = (container, y) => {
+    const els = [...container.querySelectorAll('.ad-item[data-default="0"]:not(.is-dragging)')];
+    return els.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+  };
+
+  adWrapVar.addEventListener('dragstart', (e) => {
+    const item = e.target?.closest?.('.ad-item');
+    if (!item || item.dataset.default === '1') return;
+    if (e.target?.closest?.('input,textarea,button')) {
+      e.preventDefault();
+      return;
+    }
+    draggingItem = item;
+    item.classList.add('is-dragging');
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', 'ad-item');
+    }
+  });
+
+  adWrapVar.addEventListener('dragover', (e) => {
+    if (!draggingItem) return;
+    e.preventDefault();
+    const afterElement = getDragAfterElement(adWrapVar, e.clientY);
+    if (!afterElement) adWrapVar.appendChild(draggingItem);
+    else adWrapVar.insertBefore(draggingItem, afterElement);
+  });
+
+  adWrapVar.addEventListener('drop', (e) => {
+    if (!draggingItem) return;
+    e.preventDefault();
+  });
+
+  adWrapVar.addEventListener('dragend', () => {
+    if (!draggingItem) return;
+    draggingItem.classList.remove('is-dragging');
+    draggingItem = null;
+    updateAdLabels();
+    requestRender();
+    persistFormState();
+    updateAdsSectionHeight();
   });
 }
 
@@ -884,6 +968,25 @@ function setupShareInputs() {
     if (!body) return;
     if (body.closest('.form-section')?.classList.contains('is-collapsed')) return;
     body.style.maxHeight = `${body.scrollHeight}px`;
+  };
+
+  const scrollNewShareIntoView = (item) => {
+    const target = item.querySelector('.share-q') || item;
+    const form = wrap.closest('.form');
+    if (!target) return;
+    if (!form) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const formRect = form.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const targetTopInForm = form.scrollTop + (targetRect.top - formRect.top);
+    const nextTop = Math.max(0, targetTopInForm - form.clientHeight * 0.35);
+    form.scrollTo({ top: nextTop, behavior: 'smooth' });
+    if (Math.abs(form.scrollTop - nextTop) < 1) {
+      form.scrollTop = nextTop;
+    }
   };
 
   wrap.addEventListener('input', (e) => {
@@ -923,6 +1026,11 @@ function setupShareInputs() {
     requestRender();
     persistFormState();
     updateShareSectionHeight();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollNewShareIntoView(el);
+      });
+    });
   });
 
   updateShareLabels();
@@ -1020,27 +1128,17 @@ function restoreFormState() {
 
       data.ads.forEach((item, idx) => {
         const isDefault = Boolean(item.isDefault);
-        const el = document.createElement('div');
-        el.className = 'ad-item';
-        el.dataset.default = isDefault ? '1' : '0';
         const label = isDefault ? '기본광고' : `광고 ${idx + 1}`;
-        el.innerHTML = `
-          <div class="ad-head">
-            <strong>${label}</strong>
-            <button type="button" class="ad-remove" aria-label="삭제">×</button>
-          </div>
-          <div>
-            <label>제목</label>
-            <input type="text" class="ad-title" value="${item.title ?? ''}" placeholder="" />
-          </div>
-          <div>
-            <label>내용(줄마다 자동 '-' 불렛)</label>
-            <textarea class="ad-body" placeholder="">${item.body ?? ''}</textarea>
-          </div>
-        `;
+        const el = createAdInputElement({
+          label,
+          title: item.title ?? '',
+          body: item.body ?? '',
+          isDefault
+        });
         if (isDefault) adWrapDefault?.appendChild(el);
         else adWrapVar?.appendChild(el);
       });
+      updateAdLabels();
     }
 
     if (Array.isArray(data.shares)) {
