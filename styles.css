@@ -3,69 +3,13 @@
   --muted:#666;
   --rule:#bfbfbf;
   --paper:#fff;
+  --liturgy-font-print: 'SchoolSafetyNotification';
+  --liturgy-font-read: 'SchoolSafetyNotification';
   /* JIS B5 landscape */
   --b5-w: 257mm;
   --b5-h: 182mm;
 
   --safe: 10mm;
-}
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
-    font-weight: 200;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
-    font-weight: 300;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2);
-    font-weight: 400;
-    font-display: swap;
-}
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
-    font-weight: 400;
-    font-display: swap;
-}
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
-    font-weight: 400;
-    font-display: swap;
-}
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
-    font-weight: 400;
-    font-display: swap;
-}
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
-    font-weight: 400;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
-    font-weight: 600;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'MaruBuri';
-    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
-    font-weight: 700;
-    font-display: swap;
 }
 
 @font-face {
@@ -151,7 +95,7 @@ body{
   margin:0;
   color:var(--ink);
   background:#f4f5f7;
-  font-family: var(--font-body);
+  font-family: Presentation;
   overflow: hidden;
 }
 
@@ -213,12 +157,7 @@ header{
 .form-options{
   display:flex;
   flex-wrap:wrap;
-  justify-content: space-around;
-  gap: 10px 3px;
-  padding:8px 10px;
-  border:1px dashed #d7dbe0;
-  border-radius:8px;
-  background:#f7f8fa;
+  justify-content: space-between;
 }
 .toggle-btn{
   border:1px solid #cfd3d8;
@@ -293,6 +232,12 @@ input[type="text"], textarea{
 
 textarea{ min-height:70px; resize:vertical; }
 
+#inResponsePraise{
+  min-height:0;
+  height:38px;
+  resize:none;
+}
+
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 .hint{
@@ -317,7 +262,7 @@ textarea{ min-height:70px; resize:vertical; }
   height:14px;
 }
 .divider{ border:none; border-top:1px solid #eee; margin:8px 0; }
-.mini-title{ margin:0; font-size:13px; font-family:var(--font-title); }
+.mini-title{ margin:0; font-size:13px; font-family:Presentation; }
 
 .form-section{
   display:flex;
@@ -340,7 +285,7 @@ textarea{ min-height:70px; resize:vertical; }
 }
 .section-title{
   font-size:1.2em;
-  font-family:var(--font-title);
+  font-family: SchoolSafetyNotification;
 }
 .section-icon{
   font-size:18px;
@@ -374,12 +319,15 @@ textarea{ min-height:70px; resize:vertical; }
 .form-section:not(.is-collapsed) .section-toggle{
   font-weight:500;
 }
+.form-section:not(.is-collapsed) .section-toggle:hover{
+  border-color:#e2e2e2;
+}
 .form-section[data-section="cover"] .section-body{
   border:1px solid #e2e2e2;
   background-color: #f9f9f9;
   border-top: none;
   border-radius: 0 0 8px 8px;
-  padding:8px;
+  padding: 8px 8px 14px 8px;
 }
 .form-section.is-collapsed[data-section="cover"] .section-body{
   padding:0;
@@ -416,34 +364,47 @@ textarea{ min-height:70px; resize:vertical; }
   border-top-right-radius:0;
 }
 .ad-add{
-  border:1px dashed #cfd3d8;
+  border:1px solid #cfd3d8;
   background:#1f1f1f;
   color:#ebebeb;
   padding:8px 10px;
   border-radius:8px;
   text-align:center;
   cursor:pointer;
+  transition: all 0.1s ease-in-out;
 }
 .ad-add:hover{
   border-color:#bfc4ca;
+  background:#fff;
+  color:#333;
 }
 .share-add{
-  border:1px dashed #cfd3d8;
+  border:1px solid#cfd3d8;
   background:#1f1f1f;
   color:#ebebeb;
   padding:8px 10px;
   border-radius:8px;
   text-align:center;
   cursor:pointer;
+  transition: all 0.1s ease-in-out;
 }
 .share-add:hover{
-  border-color:#bfc4ca;
+  border-color:#d6d6d6;
+  background:#fff;
+  color:#333;
 }
 .ad-item, .share-item-input{
   border:1px solid #eee;
   background-color: #f9f9f9;
   border-radius:10px;
   padding:10px;
+}
+.ad-item[data-default="0"] .ad-head{
+  cursor:grab;
+}
+.ad-item.is-dragging{
+  opacity:0.55;
+  border-color:#b8bdc3;
 }
 
 #adInputsVar .ad-item:first-child,
@@ -461,7 +422,32 @@ textarea{ min-height:70px; resize:vertical; }
   font-size: 15px;
   justify-content:space-between;
   align-items:center;
+  font-weight: 400;
   margin: 4px;
+}
+.ad-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.ad-edit-toggle{
+  border:1px solid #ddd;
+  background:#fff;
+  color:#333;
+  height:24px;
+  border-radius:999px;
+  padding:0 10px;
+  font-size:12px;
+  line-height:1;
+}
+.ad-edit-toggle:hover{
+  border-color:#b8bdc3;
+}
+.ad-item.is-locked .ad-title,
+.ad-item.is-locked .ad-body{
+  background:#f9f9f9;
+  user-select:none;
+  pointer-events:none;
 }
 .ad-remove{
   border:1px solid #ddd;
@@ -617,12 +603,16 @@ button:hover{ border-color:#bbb; }
 }
 
 .preview-area{
-  padding: 30px 20px 30px 20px;
-  overflow:auto;
+  padding: 30px;
+  overflow:scroll;
+  scrollbar-gutter: stable;
   background:#ecedef;
   display:flex;
   flex-direction:column;
   align-items:center;
+}
+#tabPrint{
+  width:max-content;
 }
 .print-note{
   font-size:12px;
@@ -718,18 +708,16 @@ button:hover{ border-color:#bbb; }
   margin-bottom: 5mm;
 }
 .ads-block .ads-block-title{
-  font-weight: 700;
-  margin-bottom: 1mm;
+  font-weight: 600;
+  font-size: 11pt;
 }
 .ads-block .ads-lines{
-  margin-left: 12px; /* 제목 기준 들여쓰기 */
+  margin-left: 15px; /* 제목 기준 들여쓰기 */
   color: var(--ink);
 }
 .ads-block .ads-line{
   display:block;
-  font-size: 11pt;
-  padding-left: 0.7em;
-  text-indent: -0.7em;
+  font-size: 10pt;
   font-family: 'Presentation';
   font-weight: 400;
   line-height: 1.1;
@@ -737,7 +725,7 @@ button:hover{ border-color:#bbb; }
   overflow-wrap: break-word;
 }
 .ads-block .ads-line::before{
-  content:"- ";
+  content:"";
   color: var(--ink);
 }
 .ads-block .ads-subline{
@@ -746,7 +734,18 @@ button:hover{ border-color:#bbb; }
 }
 
 /* ===== 표지(겉면 우) ===== */
-.cover-page{ padding:  5mm; }
+.cover-page{
+  padding: 5mm 0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  height:100%;
+}
+.cover-head{
+  display:flex;
+  flex-direction:column;
+  gap: 1.5mm;
+}
 .cover-date{
   text-align:center;
   font-family: 'SchoolSafetyNotification';
@@ -757,15 +756,17 @@ button:hover{ border-color:#bbb; }
 .cover-title{
   text-align:center;
   font-family: 'SchoolSafetyNotification';
-  font-size: 18pt;
+  font-size: 16pt;
   font-weight: 500;
-  margin-top: 5px;
+  margin-top: 0;
 }
 .cover-verse{
-  margin-top: 6mm;
+  margin-top: 0;
   text-align:center;
   font-size: 8pt;
-  font-family: 'MaruBuri';
+  font-weight: 300;
+  font-style: italic;
+  font-family: 'Presentation';
   color:#444;
   line-height:1.45;
   white-space: pre-wrap;
@@ -774,21 +775,21 @@ button:hover{ border-color:#bbb; }
 .rule-wrap{
   display: flex;
   align-items:center;
-  margin: 8mm 0 6mm 0;
+  margin: 5mm 0;
 }
-.rule-wrap.bottom{ margin-top: 7mm; }
-.rule{ height:1px; background:#9c9c9c; flex:1; }
+
+
+.rule{ height:1px; background:#000; flex:1; }
 .diamond{
   width:7px; height:7px;
-  border:1px solid #666;
+  border:1px solid #000;
   transform: rotate(45deg);
-  margin: 0 3px;
 }
 .liturgy{
   display:flex;
   flex-direction:column;
   gap: 6mm;
-  font-size: 10pt;
+  font-size: 9.7pt;
 }
 .read-stack .liturgy{
   gap: 3.5mm;
@@ -806,14 +807,14 @@ button:hover{ border-color:#bbb; }
   letter-spacing: -1px;
   white-space: nowrap;
   text-align-last: justify;
-  font-family: 'SchoolSafetyNotification';
+  font-family: var(--liturgy-font-print);
 }
 
 .lit-right{
   text-align: justify;
   text-align-last: justify;
   white-space: nowrap;
-  font-family: 'SchoolSafetyNotification';
+  font-family: var(--liturgy-font-print);
 }
 
 /* 가운데 칸: 선을 뒤에 깔고, 텍스트는 흰 배경으로 */
@@ -842,11 +843,19 @@ button:hover{ border-color:#bbb; }
   right:0;
   top:50%;
   transform: translateY(-50%);
-  border-top: 1px solid #bfbfbf;
+  border-top: 1.3px solid #333;
   z-index:0;
 }
 .lit-mid.stacked::before{
   display:none;
+}
+#pSermonTitleQuoted::before{
+  display:block;
+  top:40%;
+}
+#pSermonTitleQuoted .lit-mid-text.ref-line{
+  background:transparent;
+  padding:0;
 }
 
 /* 텍스트는 선 위에 + 흰 배경으로 “화이트아웃” */
@@ -858,13 +867,19 @@ button:hover{ border-color:#bbb; }
   line-height: 1.2;
   white-space: pre-wrap;     /* 찬양 여러 줄 가능 */
   text-align:center;
-  font-family: 'SchoolSafetyNotification';
+  font-family: var(--liturgy-font-print);
   display:inline-block;
+}
+.read-stack .liturgy .lit-label,
+.read-stack .liturgy .lit-right,
+.read-stack .liturgy .lit-mid-text{
+  font-family: var(--liturgy-font-read);
+  font-size: 10pt;
 }
 .lit-mid-text.ref-line{
   display:block;
-  font-size: 9pt;
-  color:#777;
+  font-size: 8.7pt;
+  color:#000;
   margin-top: 1.5mm;
 }
 .font-ssn{
@@ -883,14 +898,14 @@ button:hover{ border-color:#bbb; }
 }
 
 /* ===== 속면 좌: 설교+나눔 ===== */
-.share-page{ padding: 5mm 2mm; }
+.share-page{ padding: 1mm; }
 .sermon-title{
   font-family: SchoolSafetyNotification;
-  font-size: 18pt;
+  font-size: 16pt;
   margin-bottom: 6mm;
 }
 .read-stack .sermon-title{
-  font-size: 16pt;
+  font-size: 14pt;
 }
 .sermon-body{
   font-size: 11pt;
@@ -908,7 +923,7 @@ button:hover{ border-color:#bbb; }
   display:none;
 }
 .sermon-body .verse-sup{
-  font-size: 0.7em;
+  font-size: 0.8em;
   vertical-align: super;
 }
 .sermon-body .verse-line{
@@ -916,7 +931,7 @@ button:hover{ border-color:#bbb; }
 }
 .sermon-body .verse-line.verse-numbered{
   display:grid;
-  grid-template-columns: 1.6em 1fr;
+  grid-template-columns: 0.6em 1fr;
   column-gap: 0.3em;
 }
 .sermon-body .verse-num{
@@ -940,6 +955,7 @@ button:hover{ border-color:#bbb; }
 .share-item{
   white-space: pre-wrap;
   line-height:1.2;
+  font-size: 11pt;
   font-family: 'presentation';
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -974,21 +990,21 @@ button:hover{ border-color:#bbb; }
 }
 .memo-title{
   font-family: 'Presentation';
-  font-weight:700;
+  font-weight:600;
   font-size: 15pt;
   position: absolute;
   top: -0.55em;
-  left: 8mm;
+  left: 5mm;
   background: #fff;
   padding: 0 2mm;
   margin: 0;
-  color: #555;
+  color: #000;
   z-index: 2;
 }
 .memo-box{
   flex: 1 1 0;
   min-height: 40mm;
-  border: 1px solid #666;
+  border: 1.5px solid #000;
   border-radius: 2px;
   background:#fff;
   position: relative;
@@ -1038,12 +1054,11 @@ button:hover{ border-color:#bbb; }
 .hidden{ display:none; }
 #tabRead{
   min-height: 500px;
-  max-width: 450px;
+  max-width: 480px;
 }
 
 /* ===== 읽기용 ===== */
 .read-stack{
-  max-width: 450px;
   margin:0 auto;
   display:flex;
   flex-direction:column;
@@ -1069,7 +1084,10 @@ button:hover{ border-color:#bbb; }
   overflow:visible;
 }
 .read-stack .read-cover-page{
-  padding: 10mm 10mm 0mm 10mm;
+  padding: 10mm 9mm 0mm 9mm;
+}
+.read-stack .read-cover-page .cover-verse{
+  margin: 3mm 0;
 }
 .read-stack .read-share-page{
   padding: 5mm 10mm;
@@ -1134,4 +1152,7 @@ button:hover{ border-color:#bbb; }
     height: 100%;
   }
   .memo-page{ border:none; }
+  .cover-verse{
+    display:none;
+  }
 }
