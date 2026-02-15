@@ -876,6 +876,9 @@ button:hover{ border-color:#bbb; }
   font-family: var(--liturgy-font-read);
   font-size: 10pt;
 }
+.read-stack .liturgy .ad-mid-note{
+  display:none;
+}
 .lit-mid-text.ref-line{
   display:block;
   font-size: 8.7pt;
