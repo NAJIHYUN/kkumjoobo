@@ -144,7 +144,7 @@ header{
   margin:0;
   padding:10px 12px;
   font-size:14px;
-  border-bottom:1px solid #eee;
+  border-bottom:1px solid #e2e2e2;
   background:#fafafa;
 }
 
@@ -394,7 +394,7 @@ textarea{ min-height:70px; resize:vertical; }
   color:#333;
 }
 .ad-item, .share-item-input{
-  border:1px solid #eee;
+  border:1px solid #e2e2e2;
   background-color: #f9f9f9;
   border-radius:10px;
   padding:10px;
