@@ -706,13 +706,23 @@ button:hover{ border-color:#bbb; }
 }
 .ads-block{
   margin-bottom: 5mm;
+  display:grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 6px;
+}
+.ads-block .ads-block-num{
+  grid-column: 1;
+  font-weight: 600;
+  font-size: 11pt;
+  white-space: nowrap;
 }
 .ads-block .ads-block-title{
+  grid-column: 2;
   font-weight: 600;
   font-size: 11pt;
 }
 .ads-block .ads-lines{
-  margin-left: 15px; /* 제목 기준 들여쓰기 */
+  grid-column: 2;
   color: var(--ink);
 }
 .ads-block .ads-line{
