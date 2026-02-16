@@ -1221,6 +1221,62 @@ function setupSectionBodyAutoResize(sectionSelector) {
   update();
 }
 
+function updateClosestSectionBodyHeight(fromEl) {
+  const body = fromEl?.closest?.('.section-body');
+  if (!body) return;
+  const section = body.closest('.form-section');
+  if (section?.classList.contains('is-collapsed')) return;
+  body.style.maxHeight = `${body.scrollHeight}px`;
+}
+
+function setupTextareaResizeHeightSync() {
+  let activeTextarea = null;
+  let isPointerDown = false;
+  let rafId = null;
+
+  const capture = (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLTextAreaElement)) return;
+    activeTextarea = target;
+  };
+
+  const sync = () => {
+    if (!activeTextarea) return;
+    const target = activeTextarea;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      updateClosestSectionBodyHeight(target);
+      rafId = null;
+    });
+  };
+
+  const onPointerDown = (e) => {
+    capture(e);
+    if (!activeTextarea) return;
+    isPointerDown = true;
+  };
+
+  const onPointerMove = () => {
+    if (!isPointerDown || !activeTextarea) return;
+    sync();
+  };
+
+  const onPointerUp = () => {
+    if (!isPointerDown) return;
+    isPointerDown = false;
+    sync();
+  };
+
+  document.addEventListener('mousedown', onPointerDown);
+  document.addEventListener('touchstart', onPointerDown, { passive: true });
+  document.addEventListener('mousemove', onPointerMove);
+  document.addEventListener('touchmove', onPointerMove, { passive: true });
+  document.addEventListener('focusin', capture);
+  document.addEventListener('input', capture);
+  document.addEventListener('mouseup', onPointerUp);
+  document.addEventListener('touchend', onPointerUp);
+}
+
 /** -----------------------------
  * 시작
  * ----------------------------- */
@@ -1235,6 +1291,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupShareInputs();
   setupSections();
   setupSectionBodyAutoResize('.form-section[data-section="body"]');
+  setupTextareaResizeHeightSync();
   // 초기 탭 상태 정리
   const activeTab = document.querySelector('.tab.active')?.dataset?.tab || 'print';
   const tabPrint = $('tabPrint');
