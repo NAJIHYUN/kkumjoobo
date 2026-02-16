@@ -999,7 +999,7 @@ button:hover{ border-color:#bbb; }
   gap: 3mm;
   flex: 1 1 0;
   padding-top: 0mm;
-  margin: 20px 0px 10px 0;
+  margin: 15px 0px 10px 0;
 }
 .memo-title{
   font-family: 'Presentation';
