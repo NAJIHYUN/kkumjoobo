@@ -2,6 +2,14 @@
 
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = 'jubbo_form_v1';
+const HISTORY_MAX = 200;
+
+const historyState = {
+  undo: [],
+  redo: [],
+  lastSerialized: '',
+  isApplying: false
+};
 
 function safeText(v) {
   return (v ?? '').toString();
@@ -1060,30 +1068,127 @@ function getShareInputsState() {
   }));
 }
 
-function persistFormState() {
+function collectFormState() {
+  return {
+    inDate: $('inDate')?.value ?? '',
+    inDatePicker: $('inDatePicker')?.value ?? '',
+    inSermonTitle: $('inSermonTitle')?.value ?? '',
+    inHeaderVerse: $('inHeaderVerse')?.value ?? '',
+    inPraise: $('inPraise')?.value ?? '',
+    inResponsePraise: $('inResponsePraise')?.value ?? '',
+    inPrayerLeader: $('inPrayerLeader')?.value ?? '',
+    inOfferingLeader: $('inOfferingLeader')?.value ?? '',
+    inAdLeader: $('inAdLeader')?.value ?? '',
+    inSermonBody: $('inSermonBody')?.value ?? '',
+    inSermonRef: $('inSermonRef')?.value ?? '',
+    inSermonPreacher: $('inSermonPreacher')?.value ?? '',
+    inBenediction: $('inBenediction')?.value ?? '',
+    inShowQr: $('btnShowQr')?.classList.contains('is-on') ?? false,
+    inAdsMany: $('btnAdsMany')?.classList.contains('is-on') ?? false,
+    ads: getAdInputsState(),
+    shares: getShareInputsState()
+  };
+}
+
+function recordHistory(payload) {
+  if (historyState.isApplying) return;
+  const serialized = JSON.stringify(payload);
+  if (serialized === historyState.lastSerialized) return;
+
+  historyState.undo.push(serialized);
+  if (historyState.undo.length > HISTORY_MAX) {
+    historyState.undo.shift();
+  }
+  historyState.redo = [];
+  historyState.lastSerialized = serialized;
+}
+
+function persistFormState(options = {}) {
+  const { skipHistory = false } = options;
   try {
-    const payload = {
-      inDate: $('inDate')?.value ?? '',
-      inDatePicker: $('inDatePicker')?.value ?? '',
-      inSermonTitle: $('inSermonTitle')?.value ?? '',
-      inHeaderVerse: $('inHeaderVerse')?.value ?? '',
-      inPraise: $('inPraise')?.value ?? '',
-      inResponsePraise: $('inResponsePraise')?.value ?? '',
-      inPrayerLeader: $('inPrayerLeader')?.value ?? '',
-      inOfferingLeader: $('inOfferingLeader')?.value ?? '',
-      inAdLeader: $('inAdLeader')?.value ?? '',
-      inSermonBody: $('inSermonBody')?.value ?? '',
-      inSermonRef: $('inSermonRef')?.value ?? '',
-      inSermonPreacher: $('inSermonPreacher')?.value ?? '',
-      inBenediction: $('inBenediction')?.value ?? '',
-      inShowQr: $('btnShowQr')?.classList.contains('is-on') ?? false,
-      inAdsMany: $('btnAdsMany')?.classList.contains('is-on') ?? false,
-      ads: getAdInputsState(),
-      shares: getShareInputsState()
-    };
+    const payload = collectFormState();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    if (!skipHistory) {
+      recordHistory(payload);
+    }
   } catch (err) {
     console.warn('persistFormState failed', err);
+  }
+}
+
+function applyFormState(data) {
+  const setVal = (id, v) => {
+    const el = $(id);
+    if (!el || v == null) return;
+    if (el.type === 'checkbox') el.checked = Boolean(v);
+    else el.value = v;
+  };
+
+  setVal('inDate', data.inDate);
+  setVal('inDatePicker', data.inDatePicker);
+  setVal('inSermonTitle', data.inSermonTitle);
+  setVal('inHeaderVerse', data.inHeaderVerse);
+  setVal('inPraise', data.inPraise);
+  setVal('inResponsePraise', data.inResponsePraise);
+  setVal('inPrayerLeader', data.inPrayerLeader);
+  setVal('inOfferingLeader', data.inOfferingLeader);
+  setVal('inAdLeader', data.inAdLeader);
+  setVal('inSermonBody', data.inSermonBody);
+  setVal('inSermonRef', data.inSermonRef);
+  setVal('inSermonPreacher', data.inSermonPreacher);
+  setVal('inBenediction', data.inBenediction);
+
+  const btnShowQr = $('btnShowQr');
+  const btnAdsMany = $('btnAdsMany');
+  if (btnShowQr) {
+    const show = Boolean(data.inShowQr);
+    btnShowQr.classList.toggle('is-on', show);
+    btnShowQr.setAttribute('aria-pressed', String(show));
+  }
+  if (btnAdsMany) {
+    const adsMany = Boolean(data.inAdsMany);
+    btnAdsMany.classList.toggle('is-on', adsMany);
+    btnAdsMany.setAttribute('aria-pressed', String(adsMany));
+  }
+
+  if (Array.isArray(data.ads)) {
+    const adWrapVar = $('adInputsVar');
+    const adWrapDefault = $('adInputsDefault');
+    if (adWrapVar) adWrapVar.innerHTML = '';
+    if (adWrapDefault) adWrapDefault.innerHTML = '';
+
+    data.ads.forEach((item, idx) => {
+      const isDefault = Boolean(item.isDefault);
+      const label = isDefault ? '기본광고' : `광고 ${idx + 1}`;
+      const el = createAdInputElement({
+        label,
+        title: item.title ?? '',
+        body: item.body ?? '',
+        isDefault
+      });
+      if (isDefault) adWrapDefault?.appendChild(el);
+      else adWrapVar?.appendChild(el);
+    });
+    updateAdLabels();
+  }
+
+  if (Array.isArray(data.shares)) {
+    const wrapVar = $('shareInputsVar');
+    if (wrapVar) wrapVar.innerHTML = '';
+    data.shares.forEach((item, idx) => {
+      const el = document.createElement('div');
+      el.className = 'share-item-input';
+      el.innerHTML = `
+        <div class="ad-head">
+          <strong>나눔 ${idx + 1}</strong>
+          <button type="button" class="share-remove" aria-label="삭제">×</button>
+        </div>
+        <div>
+          <textarea class="share-q" placeholder="">${item.q ?? ''}</textarea>
+        </div>
+      `;
+      wrapVar?.appendChild(el);
+    });
   }
 }
 
@@ -1092,81 +1197,65 @@ function restoreFormState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const data = JSON.parse(raw);
-
-    const setVal = (id, v) => {
-      const el = $(id);
-      if (!el || v == null) return;
-      if (el.type === 'checkbox') el.checked = Boolean(v);
-      else el.value = v;
-    };
-
-    setVal('inDate', data.inDate);
-    setVal('inDatePicker', data.inDatePicker);
-    setVal('inSermonTitle', data.inSermonTitle);
-    setVal('inHeaderVerse', data.inHeaderVerse);
-    setVal('inPraise', data.inPraise);
-    setVal('inResponsePraise', data.inResponsePraise);
-    setVal('inPrayerLeader', data.inPrayerLeader);
-    setVal('inOfferingLeader', data.inOfferingLeader);
-    setVal('inAdLeader', data.inAdLeader);
-    setVal('inSermonBody', data.inSermonBody);
-    setVal('inSermonRef', data.inSermonRef);
-    setVal('inSermonPreacher', data.inSermonPreacher);
-    setVal('inBenediction', data.inBenediction);
-    const btnShowQr = $('btnShowQr');
-    const btnAdsMany = $('btnAdsMany');
-    if (btnShowQr) {
-      const show = Boolean(data.inShowQr);
-      btnShowQr.classList.toggle('is-on', show);
-      btnShowQr.setAttribute('aria-pressed', String(show));
-    }
-    if (btnAdsMany) {
-      btnAdsMany.classList.toggle('is-on', Boolean(data.inAdsMany));
-      btnAdsMany.setAttribute('aria-pressed', String(Boolean(data.inAdsMany)));
-    }
-
-    if (Array.isArray(data.ads)) {
-      const adWrapVar = $('adInputsVar');
-      const adWrapDefault = $('adInputsDefault');
-      if (adWrapVar) adWrapVar.innerHTML = '';
-      if (adWrapDefault) adWrapDefault.innerHTML = '';
-
-      data.ads.forEach((item, idx) => {
-        const isDefault = Boolean(item.isDefault);
-        const label = isDefault ? '기본광고' : `광고 ${idx + 1}`;
-        const el = createAdInputElement({
-          label,
-          title: item.title ?? '',
-          body: item.body ?? '',
-          isDefault
-        });
-        if (isDefault) adWrapDefault?.appendChild(el);
-        else adWrapVar?.appendChild(el);
-      });
-      updateAdLabels();
-    }
-
-    if (Array.isArray(data.shares)) {
-      const wrapVar = $('shareInputsVar');
-      if (wrapVar) wrapVar.innerHTML = '';
-      data.shares.forEach((item, idx) => {
-        const el = document.createElement('div');
-        el.className = 'share-item-input';
-        el.innerHTML = `
-          <div class="ad-head">
-            <strong>나눔 ${idx + 1}</strong>
-            <button type="button" class="share-remove" aria-label="삭제">×</button>
-          </div>
-          <div>
-            <textarea class="share-q" placeholder="">${item.q ?? ''}</textarea>
-          </div>
-        `;
-        wrapVar?.appendChild(el);
-      });
-    }
+    applyFormState(data);
   } catch (err) {
     console.warn('restoreFormState failed', err);
   }
+}
+
+function applyHistoryState(serialized) {
+  try {
+    const data = JSON.parse(serialized);
+    historyState.isApplying = true;
+    applyFormState(data);
+    render();
+    persistFormState({ skipHistory: true });
+    historyState.lastSerialized = serialized;
+  } catch (err) {
+    console.warn('applyHistoryState failed', err);
+  } finally {
+    historyState.isApplying = false;
+  }
+}
+
+function undoFormState() {
+  if (historyState.undo.length <= 1) return;
+  const current = historyState.undo.pop();
+  if (!current) return;
+  historyState.redo.push(current);
+  const previous = historyState.undo[historyState.undo.length - 1];
+  if (!previous) return;
+  applyHistoryState(previous);
+}
+
+function redoFormState() {
+  if (historyState.redo.length === 0) return;
+  const next = historyState.redo.pop();
+  if (!next) return;
+  historyState.undo.push(next);
+  applyHistoryState(next);
+}
+
+function setupUndoRedoShortcuts() {
+  const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  document.addEventListener('keydown', (e) => {
+    const key = safeText(e.key).toLowerCase();
+    const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+    const isUndo = ctrlOrCmd && !e.shiftKey && key === 'z';
+    const isRedo = ctrlOrCmd && e.shiftKey && key === 'z';
+    if (!isUndo && !isRedo) return;
+
+    const active = document.activeElement;
+    const isEditingField =
+      active instanceof HTMLInputElement ||
+      active instanceof HTMLTextAreaElement ||
+      Boolean(active?.isContentEditable);
+    if (isEditingField) return;
+
+    e.preventDefault();
+    if (isUndo) undoFormState();
+    if (isRedo) redoFormState();
+  });
 }
 
 function setupSections() {
@@ -1292,6 +1381,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSections();
   setupSectionBodyAutoResize('.form-section[data-section="body"]');
   setupTextareaResizeHeightSync();
+  setupUndoRedoShortcuts();
   // 초기 탭 상태 정리
   const activeTab = document.querySelector('.tab.active')?.dataset?.tab || 'print';
   const tabPrint = $('tabPrint');
@@ -1299,6 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tabPrint) tabPrint.style.display = (activeTab === 'print') ? 'block' : 'none';
   if (tabRead) tabRead.style.display = (activeTab === 'read') ? 'block' : 'none';
   render();
+  recordHistory(collectFormState());
 
   const modal = $('feedbackModal');
   const btnOpen = $('btnFeedback');
