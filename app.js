@@ -345,9 +345,13 @@ function buildAdBlock(index, title, body) {
   const block = document.createElement('div');
   block.className = 'ads-block';
 
-  const titleEl = document.createElement('div');
-  titleEl.className = 'ads-block-title';
-  titleEl.textContent = `${index}. ${t || '(제목 없음)'}`;
+  const titleNumEl = document.createElement('span');
+  titleNumEl.className = 'ads-block-num';
+  titleNumEl.textContent = `${index}.`;
+
+  const titleTextEl = document.createElement('span');
+  titleTextEl.className = 'ads-block-title';
+  titleTextEl.textContent = t || '(제목 없음)';
 
   const linesEl = document.createElement('div');
   linesEl.className = 'ads-lines';
@@ -359,7 +363,8 @@ function buildAdBlock(index, title, body) {
     linesEl.appendChild(span);
   });
 
-  block.appendChild(titleEl);
+  block.appendChild(titleNumEl);
+  block.appendChild(titleTextEl);
   block.appendChild(linesEl);
 
   return block;
